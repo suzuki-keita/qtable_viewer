@@ -12,6 +12,7 @@ from pygame.locals import *
 import map_date
 
 FOLDER_PASS = "/Users/takashi/Documents/knowledge/policy_files/"
+DATEFILE_NAME = "infomation.csv"
 
 SCR_RECT = Rect(0, 0, const.SCR_X, const.SCR_Y+const.Text_Y)   #Rect(left,top,width,height)
 CS = const.CS
@@ -50,7 +51,7 @@ class main:
 
         self.qtable_reader(self.map,self.folder_list[0])
         self.draw(self.screen,self.map,os.path.basename(self.folder_list[0]))
-        i = 0;
+        self.page = 0;
         while (1):
             pygame.time.Clock().tick(10000)
             pygame.display.update()
@@ -64,22 +65,28 @@ class main:
                         sys.exit()
 
                     elif event.key==K_LEFT: #戻る
-                        i = i - 1
-                        if i < 0:
-                            i = 0
-                        self.qtable_reader(self.map,self.folder_list[i])
-                        self.draw(self.screen,self.map,os.path.basename(self.folder_list[i]))
+                        self.page = self.page - 1
+                        if self.page < 0:
+                            self.page = 0
+                        self.qtable_reader(self.map,self.folder_list[self.page])
+                        self.draw(self.screen,self.map,os.path.basename(self.folder_list[self.page]))
 
                     elif event.key==K_RIGHT: #進む
-                        i = i + 1
-                        if i >= len(self.folder_list)-1:
-                            i = len(self.folder_list)-1
-                        self.qtable_reader(self.map,self.folder_list[i])
-                        self.draw(self.screen,self.map,os.path.basename(self.folder_list[i]))
+                        self.page = self.page + 1
+                        if self.page >= len(self.folder_list)-1:
+                            self.page = len(self.folder_list)-1
+                        self.qtable_reader(self.map,self.folder_list[self.page])
+                        self.draw(self.screen,self.map,os.path.basename(self.folder_list[self.page]))
+
+                    elif event.key==K_s: #保存
+                        self.write_date = []
+                        for i in range(0,len(self.folder_list)):
+                            self.qtable_reader(self.map,self.folder_list[i])
+                            self.write_date.append([os.path.basename(self.folder_list[i]),self.infomation[0],self.infomation[1],self.infomation[2]])
+                        self.write_qtable_information(DATEFILE_NAME,self.write_date)
+                        print("save!")
 
     def qtable_reader(self,_map,_name):
-        o = open(_name, 'r')
-        dataReader = csv.reader(o)
         self.qtable = []
         self.table_length = 0
         self.map_f = []
@@ -92,32 +99,34 @@ class main:
         self.map_l = []
         self.map_m = []
 
-        for row in dataReader:
-            # q値を配列qtableに書き込み
-            self.qtable.append(float(row[3]))
-            # QテーブルのF列を書き込み
-            self.map_f.append(float(row[5]))
-            # QテーブルのG列を書き込み
-            self.map_g.append(float(row[6]))
-            # QテーブルのH列を書き込み
-            self.map_h.append(float(row[7]))
-            # QテーブルのI列を書き込み
-            self.map_i.append(float(row[8]))
-            # QテーブルのE列を書き込み
-            self.map_e.append(float(row[4]))
-            # QテーブルのJ列を書き込み
-            self.map_j.append(float(row[9]))
-            # QテーブルのK列を書き込み
-            self.map_k.append(float(row[10]))
-            # QテーブルのL列を書き込み
-            self.map_l.append(float(row[11]))
-            # QテーブルのM列を書き込み
-            self.map_m.append(float(row[12]))
-            # start座標を書き込み
-            _map.start_grid[0] = int(row[13])
-            _map.start_grid[1] = int(row[14])
-            # q_tableの長さ
-            self.table_length = self.table_length + 1
+        with open(_name, 'r') as o:
+            dataReader = csv.reader(o)
+            for row in dataReader:
+                # q値を配列qtableに書き込み
+                self.qtable.append(float(row[3]))
+                # QテーブルのF列を書き込み
+                self.map_f.append(float(row[5]))
+                # QテーブルのG列を書き込み
+                self.map_g.append(float(row[6]))
+                # QテーブルのH列を書き込み
+                self.map_h.append(float(row[7]))
+                # QテーブルのI列を書き込み
+                self.map_i.append(float(row[8]))
+                # QテーブルのE列を書き込み
+                self.map_e.append(float(row[4]))
+                # QテーブルのJ列を書き込み
+                self.map_j.append(float(row[9]))
+                # QテーブルのK列を書き込み
+                self.map_k.append(float(row[10]))
+                # QテーブルのL列を書き込み
+                self.map_l.append(float(row[11]))
+                # QテーブルのM列を書き込み
+                self.map_m.append(float(row[12]))
+                # start座標を書き込み
+                _map.start_grid[0] = int(row[13])
+                _map.start_grid[1] = int(row[14])
+                # q_tableの長さ
+                self.table_length = self.table_length + 1
 
         self.count_qtable = 0
         for x in range(1, const.S_NUM_ROW+1):
@@ -201,6 +210,11 @@ class main:
                 self.screen.blit(possibility, (20,const.SCR_Y+105))
                 self.screen.blit(filename, (20,const.SCR_Y+140))
 
+    def write_qtable_information(self,_filename,_date):
+        with open(_filename,mode="w") as w:
+            writer = csv.writer(w, lineterminator='\n')
+            writer.writerows(_date)
+        return 1
 
     def get_qtable_list(self):
         self.fl = glob.glob(FOLDER_PASS+"*")
