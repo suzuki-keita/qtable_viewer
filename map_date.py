@@ -54,7 +54,6 @@ class map_date:
             self.route_y.append(self.grid_y)
             self.grid_x = self.next_grid_x
             self.grid_y = self.next_grid_y
-
             if self.break_flag == True:
                 break
 
@@ -97,16 +96,18 @@ class map_date:
         self.route_length = len(self.route_x)
         self.route_rotation = 0
         self.route_possibility = 0
-        for i in range(self.route_length-1):
+        for i in range(self.route_length):
             #回転数
             #篠田のアドバイスで解決ゾロリ
-            if self.get_max_q_action(self.qtable,self.route_x[i],self.route_y[i]) != self.get_max_q_action(self.qtable,self.route_x[i+1],self.route_y[i+1]):
-                self.route_rotation = self.route_rotation + 1
+            if i != self.route_length -1:
+                if self.get_max_q_action(self.qtable,self.route_x[i],self.route_y[i]) != self.get_max_q_action(self.qtable,self.route_x[i+1],self.route_y[i+1]):
+                    self.route_rotation = self.route_rotation + 1
             #エージェントが取り得る他の路
             for j in [1,3,5,7]:
                 if self.mapping_table[self.route_x[i]][self.route_y[i]][0][j] == 2:
                     self.route_possibility = self.route_possibility + 1
-
+            
+        self.route_possibility -= (self.route_length-2) * 2 + 2
         return self.route_length,self.route_rotation,self.route_possibility
 
     def get_max_q_action(self,_qtable,_x,_y):

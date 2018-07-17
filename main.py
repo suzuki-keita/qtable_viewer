@@ -83,6 +83,7 @@ class main:
                         for i in range(0,len(self.folder_list)):
                             self.qtable_reader(self.map,self.folder_list[i])
                             self.write_date.append([os.path.basename(self.folder_list[i]),self.infomation[0],self.infomation[1],self.infomation[2]])
+                            print(self.infomation[0],self.infomation[1],self.infomation[2])
                         self.write_qtable_information(DATEFILE_NAME,self.write_date)
                         print("save!")
 
