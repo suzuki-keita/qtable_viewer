@@ -21,6 +21,23 @@ S_NUM_COL = 10
 START_X = 1
 START_Y = 10
 
+GLID = 49
+EGENT = 1
+ACTION = 5
+START = 0
+GOAL = 1
+ROAD = 2
+WALL = 3
+AGT = 4
+MAP = 9
+ROBOT = 4
+CS_COLOR = (255, 255, 255)
+LEFT = 3
+RIGHT = 1
+UP = 0
+DOWN = 2
+STOP = 4
+DIREC = [LEFT, RIGHT, UP, DOWN]
 
 Step_Agent1=0
 Step_f_Agent1=-1

@@ -1,5 +1,8 @@
 #!/usr/local/bin python
 # -*- coding:utf-8 -+-
+
+import logging
+
 import csv
 import const
 import pygame
@@ -11,7 +14,7 @@ import sys
 from pygame.locals import *
 import map_date
 
-FOLDER_PASS = "/Users/takashi/Documents/knowledge/policy_files/"
+FOLDER_PASS = "/Users/takashi/Documents/knowledge/qtable/"
 DATEFILE_NAME = "infomation.csv"
 
 SCR_RECT = Rect(0, 0, const.SCR_X, const.SCR_Y+const.Text_Y)   #Rect(left,top,width,height)
@@ -19,27 +22,10 @@ CS = const.CS
 NUM_ROW = int(const.SCR_X / CS)   # フィールドの行数11
 NUM_COL = int(const.SCR_Y / CS)  # フィールドの列数11
 
-GLID = 49
-EGENT = 1
-ACTION = 5
-START = 0
-GOAL = 1
-ROAD = 2
-WALL = 3
-MAP = 9
-ROBOT = 4
-CS_COLOR = (255, 255, 255)
-LEFT = 0
-RIGHT = 1
-UP = 2
-DOWN = 3
-STOP = 4
-DIREC = [LEFT, RIGHT, UP, DOWN]
-
-
 class main:
 
     def __init__(self):
+        logging.basicConfig(format='%(levelname)s:%(thread)d:%(module)s:%(message)s', level=logging.DEBUG)
         pygame.init()
         self.screen = pygame.display.set_mode(SCR_RECT.size)   #以下、self.名称はアトリビュートを追加
         self.screen.fill((255,255,255))
@@ -48,7 +34,6 @@ class main:
         self.folder_list = self.get_qtable_list()
 
         self.map = map_date.map_date()
-
         self.qtable_reader(self.map,self.folder_list[0])
         self.draw(self.screen,self.map,os.path.basename(self.folder_list[0]))
         self.page = 0;
@@ -81,11 +66,12 @@ class main:
                     elif event.key==K_s: #保存
                         self.write_date = []
                         for i in range(0,len(self.folder_list)):
+                            print(self.folder_list[i])
                             self.qtable_reader(self.map,self.folder_list[i])
                             self.write_date.append([os.path.basename(self.folder_list[i]),self.infomation[0],self.infomation[1],self.infomation[2]])
                             print(self.infomation[0],self.infomation[1],self.infomation[2])
                         self.write_qtable_information(DATEFILE_NAME,self.write_date)
-                        print("save!")
+                        print("All save!")
 
     def qtable_reader(self,_map,_name):
         self.qtable = []
@@ -128,11 +114,11 @@ class main:
                 _map.start_grid[1] = int(row[14])
                 # q_tableの長さ
                 self.table_length = self.table_length + 1
-
+        
         self.count_qtable = 0
         for x in range(1, const.S_NUM_ROW+1):
             for y in range(1, const.S_NUM_COL+1):
-                for action in range(ACTION):
+                for action in range(const.ACTION):
                     # self.qtable_c[x][y][action] = const.TRANCE_RATE*self.qtable[self.count_qtable]
                     # q値と状態、行動の対応を作成
                     _map.qtable[x][y][action] = self.qtable[self.count_qtable]
@@ -151,8 +137,8 @@ class main:
         #goal座標を書き込み
         for x in range(1, const.S_NUM_ROW+1):
             for y in range(1, const.S_NUM_COL+1):
-                for action in range(ACTION):
-                    if _map.mapping_table[x][y][action][4] == GOAL:
+                for action in range(const.ACTION):
+                    if _map.mapping_table[x][y][action][4] == const.GOAL:
                         _map.goal_grid[0] = x
                         _map.goal_grid[1] = y
                         break
@@ -166,11 +152,11 @@ class main:
          for x in range(1, const.S_NUM_ROW+1):
             for y in range(1, const.S_NUM_COL+1):
                 #壁・路の色塗り
-                if _map.mapping_table[x][y][0][4] == ROAD:
-                    CS_COLOR = (255, 255, 255)
+                if _map.mapping_table[x][y][0][4] == const.ROAD:
+                    const.CS_COLOR = (255, 255, 255)
                 else:
-                    CS_COLOR = (0, 0, 0)
-                pygame.draw.rect(screen,CS_COLOR,Rect(x*CS,y*CS,CS,CS))
+                    const.CS_COLOR = (0, 0, 0)
+                pygame.draw.rect(screen,const.CS_COLOR,Rect(x*CS,y*CS,CS,CS))
 
                 if self.map.get_max_q_action_return_q(_map.qtable,x,y) != 0:   #色を濃くしていく部分（元のサンプルコード）
                     val = self.map.get_max_q_action_return_q(_map.qtable,x,y)
@@ -181,22 +167,22 @@ class main:
                     pygame.draw.rect(screen,color,Rect(x*CS,y*CS,CS,CS))
                     num = self.map.get_max_q_action(_map.qtable,x,y)
                     direction = u""
-                    if num==UP:
+                    if num==const.UP:
                         direction = u"↑"
-                    elif num==DOWN:
+                    elif num==const.DOWN:
                         direction = u"↓"
-                    elif num==LEFT:
+                    elif num==const.LEFT:
                         direction = u"←"
                     else:
                         direction = u"→"
                 #start地点の色塗り
                 if int(x) == int(_map.start_grid[0]) and int(y) == int(_map.start_grid[1]):
-                    CS_COLOR = (255, 204, 0)
-                    pygame.draw.rect(screen,CS_COLOR,Rect(x*CS,y*CS,CS,CS))
+                    const.CS_COLOR = (255, 204, 0)
+                    pygame.draw.rect(screen,const.CS_COLOR,Rect(x*CS,y*CS,CS,CS))
                 #goal地点の色塗り
                 if int(x) == int(_map.goal_grid[0]) and int(y) == int(_map.goal_grid[1]):
-                    CS_COLOR = (36, 193, 227)
-                    pygame.draw.rect(screen,CS_COLOR,Rect(x*CS,y*CS,CS,CS))
+                    const.CS_COLOR = (36, 193, 227)
+                    pygame.draw.rect(screen,const.CS_COLOR,Rect(x*CS,y*CS,CS,CS))
 
                 if self.map.get_max_q_action_return_q(_map.qtable,x,y) > 0 and self.map.get_max_q_prob(_map.qtable,x,y) >= 0.9:
                     screen.blit(self.font.render(direction, True, (0,0,0)), (x*CS,y*CS))
@@ -219,6 +205,7 @@ class main:
 
     def get_qtable_list(self):
         self.fl = glob.glob(FOLDER_PASS+"*")
+        logging.info("%s",self.fl)
         return self.fl
 
 if __name__ == '__main__':

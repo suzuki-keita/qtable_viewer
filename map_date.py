@@ -4,6 +4,7 @@ import main
 import const
 import random
 import math
+import numpy as np
 
 class map_date:
     def __init__(self):
@@ -17,8 +18,8 @@ class map_date:
         ー＋ー＋ー
         ６│７│８
         """
-        self.mapping_table = [[[[-1 for map in range(main.MAP)] for action in range(main.ACTION)]for y1 in range(const.S_NUM_COL + 1)] for x1 in range(const.S_NUM_ROW + 1)]
-        self.qtable = [[[0 for action in range(main.ACTION)]for y1 in range(const.S_NUM_COL + 1)] for x1 in range(const.S_NUM_ROW + 1)]  #qtable
+        self.mapping_table = np.zeros((const.S_NUM_ROW + 1, const.S_NUM_COL + 1, const.ACTION, const.MAP))
+        self.qtable = np.zeros((const.S_NUM_ROW+1, const.S_NUM_COL + 1, const.ACTION))
         self.start_grid = [-1,-1]
         self.goal_grid = [-1,-1]
         self.route_x = []
@@ -91,23 +92,53 @@ class map_date:
 
     def get_infomation(self):
         #各種情報を取得
-
         #経路長
         self.route_length = len(self.route_x)
         self.route_rotation = 0
         self.route_possibility = 0
-        for i in range(self.route_length):
+        self.possibility_table = np.zeros((const.S_NUM_ROW+1, const.S_NUM_COL+1))
+        self.maps = []
+        for i in range(0,self.route_length):
             #回転数
             #篠田のアドバイスで解決ゾロリ
             if i != self.route_length -1:
                 if self.get_max_q_action(self.qtable,self.route_x[i],self.route_y[i]) != self.get_max_q_action(self.qtable,self.route_x[i+1],self.route_y[i+1]):
                     self.route_rotation = self.route_rotation + 1
             #エージェントが取り得る他の路
-            for j in [1,3,5,7]:
-                if self.mapping_table[self.route_x[i]][self.route_y[i]][0][j] == 2:
+            #右
+            x = self.route_x[i]+1
+            y = self.route_y[i]
+            if self.mapping_table[x][y][0][4] == const.ROAD:
+                if str(x)+str(y) not in self.maps:
+                    self.maps.append(str(x)+str(y))
                     self.route_possibility = self.route_possibility + 1
-            
-        self.route_possibility -= (self.route_length-2) * 2 + 2
+
+            #左
+            x = self.route_x[i]-1
+            y = self.route_y[i]
+            if self.mapping_table[x][y][0][4] == const.ROAD:
+                if str(x)+str(y) not in self.maps:
+                    self.maps.append(str(x)+str(y))
+                    self.route_possibility = self.route_possibility + 1
+            #下
+            x = self.route_x[i]
+            y = self.route_y[i]+1
+            if self.mapping_table[x][y][0][4] == const.ROAD:
+                if str(x)+str(y) not in self.maps:
+                    self.maps.append(str(x)+str(y))
+                    self.route_possibility = self.route_possibility + 1
+
+            #上
+            x = self.route_x[i]
+            y = self.route_y[i]-1
+            if self.mapping_table[x][y][0][4] == const.ROAD:
+                if str(x)+str(y) not in self.maps:
+                    self.maps.append(str(x)+str(y))
+                    self.route_possibility = self.route_possibility + 1
+
+        for i in range(0, self.route_length):
+            if str(self.route_x[i])+str(self.route_y[i]) in self.maps:
+                self.route_possibility = self.route_possibility - 1
         return self.route_length,self.route_rotation,self.route_possibility
 
     def get_max_q_action(self,_qtable,_x,_y):
