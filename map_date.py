@@ -35,31 +35,68 @@ class map_date:
         self.max = 0
         self.next_grid_x = 0
         self.next_grid_y = 0
-        self.tmp = 0
+        self.tmp = [0,0,0]
         self.goals_x = [self.goal_grid[0],self.goal_grid[0]-1,self.goal_grid[0]+1,self.goal_grid[0]]
         self.goals_y = [self.goal_grid[1]-1,self.goal_grid[1],self.goal_grid[1],self.goal_grid[1]+1]
-
-        while(1):
-            self.break_flag = False
+        self.step = 0
+        self.follow_fin = False
+        while(self.step < 100):
+            if self.goal_grid[0] == self.grid_x and self.goal_grid[1] == self.grid_y:
+                self.follow_fin = True
+                break
+            self.route_x.append(self.grid_x)
+            self.route_y.append(self.grid_y)
+            self.action = self.get_max_q_action(self.qtable,self.grid_x,self.grid_y)
+            self.grid_x,self.grid_y = self.get_direction_return_xy(self.grid_x,self.grid_y,self.action)
+            self.step = self.step + 1
+            """
             for j in range(4):
                 if self.grid_x == self.goals_x[j] and self.grid_y == self.goals_y[j]:
                     self.break_flag = True
             for self.num in [1,3,5,7]:
                 self.tmp = self.get_direction_return_q(self.num,self.qtable,self.grid_x,self.grid_y)
+                print("x",self.grid_x,"y",self.grid_y,"direction ",self.num," Q ",self.tmp[0],"max",self.max)
                 if self.tmp[0] > self.max:
                     self.max = self.tmp[0]
                     self.next_grid_x = self.tmp[1]
                     self.next_grid_y = self.tmp[2]
             #ルートに追加
+            print(self.next_grid_x, self.next_grid_y)
             self.route_x.append(self.grid_x)
             self.route_y.append(self.grid_y)
             self.grid_x = self.next_grid_x
             self.grid_y = self.next_grid_y
             if self.break_flag == True:
                 break
+            self.test = self.test + 1
+            print(self.test)
+            """
+        if self.follow_fin == True:
+            return 1
+        else:
+            return 0
 
-        return 1
-
+    def get_direction_return_xy(self,_x,_y,_a):
+        _x = int(_x)
+        _y = int(_y)
+        #エージェントの上下左右のみ検出
+        if _a == const.UP:
+            _x = _x
+            _y = _y - 1
+        elif _a == const.LEFT:
+            _x = _x - 1
+            _y = _y
+        elif _a == const.RIGHT:
+            _x = _x + 1
+            _y = _y
+        elif _a == const.DOWN:
+            _x = _x
+            _y = _y + 1
+        if _x > const.S_NUM_ROW or _x < 0 or _y > const.S_NUM_COL or _y < 0:
+            return -1,-1
+        else:
+            return _x,_y
+    """
     def get_direction_return_q(self,number,_qtable,_x,_y):
         #number_to_direction
         _x = int(_x)
@@ -79,17 +116,11 @@ class map_date:
             _y = _y + 1
 
         #データ整形
-        if _x > const.S_NUM_ROW:
-            _x = const.S_NUM_ROW
-        if _x < 0:
-            _x = 0
-        if _y > const.S_NUM_COL:
-            _y = const.S_NUM_COL
-        if _y < 0:
-            _y = 0
-
-        return self.get_max_q_action_return_q(_qtable,_x,_y),_x,_y
-
+        if _x > const.S_NUM_ROW or _x < 0 or _y > const.S_NUM_COL or _y < 0:
+            return 0.0,_x,_y
+        else:
+            return self.get_max_q_action_return_q(_qtable,_x,_y),_x,_y
+    """
     def get_infomation(self):
         #各種情報を取得
         #経路長

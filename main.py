@@ -53,21 +53,37 @@ class main:
                         self.page = self.page - 1
                         if self.page < 0:
                             self.page = 0
-                        self.qtable_reader(self.map,self.folder_list[self.page])
+                        self.test = self.qtable_reader(self.map,self.folder_list[self.page])
+                        if self.test == 0:
+                            self.page = self.page - 1
+                            if self.page < 0:
+                                self.page = 0
+                                self.test = self.qtable_reader(self.map, self.folder_list[self.page])
                         self.draw(self.screen,self.map,os.path.basename(self.folder_list[self.page]))
 
                     elif event.key==K_RIGHT: #進む
                         self.page = self.page + 1
                         if self.page >= len(self.folder_list)-1:
                             self.page = len(self.folder_list)-1
-                        self.qtable_reader(self.map,self.folder_list[self.page])
-                        self.draw(self.screen,self.map,os.path.basename(self.folder_list[self.page]))
+                        self.test = self.qtable_reader(
+                            self.map, self.folder_list[self.page])
+                        if self.test == 0:
+                            self.page = self.page + 1
+                            if self.page < 0:
+                                self.page = 0
+                                self.test = self.qtable_reader(
+                                    self.map, self.folder_list[self.page])
+                        self.draw(self.screen, self.map, os.path.basename(
+                            self.folder_list[self.page]))
 
                     elif event.key==K_s: #保存
                         self.write_date = []
                         for i in range(0,len(self.folder_list)):
                             print(self.folder_list[i])
-                            self.qtable_reader(self.map,self.folder_list[i])
+                            self.test = self.qtable_reader(self.map,self.folder_list[i])
+                            if self.test == 0:
+                                i = i+1
+                                self.qtable_reader(self.map, self.folder_list[i])
                             self.write_date.append([os.path.basename(self.folder_list[i]),self.infomation[0],self.infomation[1],self.infomation[2]])
                             print(self.infomation[0],self.infomation[1],self.infomation[2])
                         self.write_qtable_information(DATEFILE_NAME,self.write_date)
@@ -143,8 +159,12 @@ class main:
                         _map.goal_grid[1] = y
                         break
 
-        self.map.follow_route()
-        self.infomation = self.map.get_infomation()
+        self.fin = self.map.follow_route()
+        if self.fin == 0:
+            return 0
+        else:
+            self.infomation = self.map.get_infomation()
+            return 1
 
     def draw(self, screen,_map,_name):
          self.screen.fill((255,255,255))
