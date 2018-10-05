@@ -14,8 +14,8 @@ import sys
 from pygame.locals import *
 import map_date
 
-FOLDER_PASS = "/Users/takashi/Documents/knowledge/qtable/"
-DATEFILE_NAME = "infomation.csv"
+FOLDER_PASS = "/Users/takashi/Documents/knowledge/qtable_1/"
+DATEFILE_NAME = "infomation_1.csv"
 
 SCR_RECT = Rect(0, 0, const.SCR_X, const.SCR_Y+const.Text_Y)   #Rect(left,top,width,height)
 CS = const.CS
