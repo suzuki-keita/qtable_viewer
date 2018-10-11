@@ -19,8 +19,8 @@ DATEFILE_NAME = "infomation_1.csv"
 
 SCR_RECT = Rect(0, 0, const.SCR_X, const.SCR_Y+const.Text_Y)   #Rect(left,top,width,height)
 CS = const.CS
-NUM_ROW = int(const.SCR_X / CS)   # フィールドの行数11
-NUM_COL = int(const.SCR_Y / CS)  # フィールドの列数11
+NUM_ROW = const.NUM_ROW   # フィールドの行数11
+NUM_COL = const.NUM_COL  # フィールドの列数11
 
 class main:
 
@@ -34,8 +34,8 @@ class main:
         self.folder_list = self.get_qtable_list()
 
         self.map = map_date.map_date()
-        self.qtable_reader(self.map,self.folder_list[0])
-        self.draw(self.screen,self.map,os.path.basename(self.folder_list[0]))
+        self.qtable_reader(self.folder_list[0])
+        self.draw(self.screen,os.path.basename(self.folder_list[0]))
         self.page = 0;
         while (1):
             pygame.time.Clock().tick(10000)
@@ -53,43 +53,41 @@ class main:
                         self.page = self.page - 1
                         if self.page < 0:
                             self.page = 0
-                        self.test = self.qtable_reader(self.map,self.folder_list[self.page])
+                        self.test = self.qtable_reader(self.folder_list[self.page])
                         if self.test == 0:
                             self.page = self.page - 1
                             if self.page < 0:
                                 self.page = 0
-                                self.test = self.qtable_reader(self.map, self.folder_list[self.page])
-                        self.draw(self.screen,self.map,os.path.basename(self.folder_list[self.page]))
+                                self.test = self.qtable_reader(self.folder_list[self.page])
+                        self.draw(self.screen,os.path.basename(self.folder_list[self.page]))
 
                     elif event.key==K_RIGHT: #進む
                         self.page = self.page + 1
                         if self.page >= len(self.folder_list)-1:
                             self.page = len(self.folder_list)-1
-                        self.test = self.qtable_reader(
-                            self.map, self.folder_list[self.page])
+                        self.test = self.qtable_reader(self.folder_list[self.page])
                         if self.test == 0:
                             self.page = self.page + 1
                             if self.page < 0:
                                 self.page = 0
-                                self.test = self.qtable_reader(
-                                    self.map, self.folder_list[self.page])
-                        self.draw(self.screen, self.map, os.path.basename(
+                                self.test = self.qtable_reader(self.folder_list[self.page])
+                        self.draw(self.screen,os.path.basename(
                             self.folder_list[self.page]))
 
                     elif event.key==K_s: #保存
                         self.write_date = []
                         for i in range(0,len(self.folder_list)):
                             print(self.folder_list[i])
-                            self.test = self.qtable_reader(self.map,self.folder_list[i])
+                            self.test = self.qtable_reader(self.folder_list[i])
                             if self.test == 0:
                                 i = i+1
-                                self.qtable_reader(self.map, self.folder_list[i])
+                                self.qtable_reader(self.folder_list[i])
                             self.write_date.append([os.path.basename(self.folder_list[i]),self.infomation[0],self.infomation[1],self.infomation[2]])
                             print(self.infomation[0],self.infomation[1],self.infomation[2])
                         self.write_qtable_information(DATEFILE_NAME,self.write_date)
                         print("All save!")
 
-    def qtable_reader(self,_map,_name):
+    def qtable_reader(self,_name):
         self.qtable = []
         self.table_length = 0
         self.map_f = []
@@ -126,37 +124,37 @@ class main:
                 # QテーブルのM列を書き込み
                 self.map_m.append(float(row[12]))
                 # start座標を書き込み
-                _map.start_grid[0] = int(row[13])
-                _map.start_grid[1] = int(row[14])
+                self.map.start_grid[0] = int(row[13])
+                self.map.start_grid[1] = int(row[14])
                 # q_tableの長さ
                 self.table_length = self.table_length + 1
         
         self.count_qtable = 0
-        for x in range(1, const.S_NUM_ROW+1):
-            for y in range(1, const.S_NUM_COL+1):
+        for x in range(1, NUM_ROW+1):
+            for y in range(1, NUM_COL+1):
                 for action in range(const.ACTION):
                     # self.qtable_c[x][y][action] = const.TRANCE_RATE*self.qtable[self.count_qtable]
                     # q値と状態、行動の対応を作成
-                    _map.qtable[x][y][action] = self.qtable[self.count_qtable]
+                    self.map.qtable[x][y][action] = self.qtable[self.count_qtable]
                     # 周囲9マスのマップデータと状態、行動の対応を作成
-                    _map.mapping_table[x][y][action][0] = self.map_f[self.count_qtable]
-                    _map.mapping_table[x][y][action][1] = self.map_g[self.count_qtable]
-                    _map.mapping_table[x][y][action][2] = self.map_h[self.count_qtable]
-                    _map.mapping_table[x][y][action][3] = self.map_i[self.count_qtable]
-                    _map.mapping_table[x][y][action][4] = self.map_e[self.count_qtable]
-                    _map.mapping_table[x][y][action][5] = self.map_j[self.count_qtable]
-                    _map.mapping_table[x][y][action][6] = self.map_k[self.count_qtable]
-                    _map.mapping_table[x][y][action][7] = self.map_l[self.count_qtable]
-                    _map.mapping_table[x][y][action][8] = self.map_m[self.count_qtable]
+                    self.map.mapping_table[x][y][action][0] = self.map_f[self.count_qtable]
+                    self.map.mapping_table[x][y][action][1] = self.map_g[self.count_qtable]
+                    self.map.mapping_table[x][y][action][2] = self.map_h[self.count_qtable]
+                    self.map.mapping_table[x][y][action][3] = self.map_i[self.count_qtable]
+                    self.map.mapping_table[x][y][action][4] = self.map_e[self.count_qtable]
+                    self.map.mapping_table[x][y][action][5] = self.map_j[self.count_qtable]
+                    self.map.mapping_table[x][y][action][6] = self.map_k[self.count_qtable]
+                    self.map.mapping_table[x][y][action][7] = self.map_l[self.count_qtable]
+                    self.map.mapping_table[x][y][action][8] = self.map_m[self.count_qtable]
 
                     self.count_qtable = self.count_qtable + 1
         #goal座標を書き込み
-        for x in range(1, const.S_NUM_ROW+1):
-            for y in range(1, const.S_NUM_COL+1):
+        for x in range(1, NUM_ROW+1):
+            for y in range(1, NUM_COL+1):
                 for action in range(const.ACTION):
-                    if _map.mapping_table[x][y][action][4] == const.GOAL:
-                        _map.goal_grid[0] = x
-                        _map.goal_grid[1] = y
+                    if self.map.mapping_table[x][y][action][4] == const.GOAL:
+                        self.map.goal_grid[0] = x
+                        self.map.goal_grid[1] = y
                         break
 
         self.fin = self.map.follow_route()
@@ -166,26 +164,26 @@ class main:
             self.infomation = self.map.get_infomation()
             return 1
 
-    def draw(self, screen,_map,_name):
+    def draw(self, screen,_name):
          self.screen.fill((255,255,255))
          sysfont = pygame.font.SysFont(None, 30)
-         for x in range(1, const.S_NUM_ROW+1):
-            for y in range(1, const.S_NUM_COL+1):
+         for x in range(1, NUM_ROW+1):
+            for y in range(1, NUM_COL+1):
                 #壁・路の色塗り
-                if _map.mapping_table[x][y][0][4] == const.ROAD:
+                if self.map.mapping_table[x][y][0][4] == const.ROAD:
                     const.CS_COLOR = (255, 255, 255)
                 else:
                     const.CS_COLOR = (0, 0, 0)
                 pygame.draw.rect(screen,const.CS_COLOR,Rect(x*CS,y*CS,CS,CS))
 
-                if self.map.get_max_q_action_return_q(_map.qtable,x,y) != 0:   #色を濃くしていく部分（元のサンプルコード）
-                    val = self.map.get_max_q_action_return_q(_map.qtable,x,y)
+                if self.map.get_max_q_action_return_q(self.map.qtable,x,y) != 0:   #色を濃くしていく部分（元のサンプルコード）
+                    val = self.map.get_max_q_action_return_q(self.map.qtable,x,y)
                     if val > 1:
                          val = 1
                     val *= 255.0   #複合演算子
                     color = (255,255-val,255-val)
                     pygame.draw.rect(screen,color,Rect(x*CS,y*CS,CS,CS))
-                    num = self.map.get_max_q_action(_map.qtable,x,y)
+                    num = self.map.get_max_q_action(self.map.qtable,x,y)
                     direction = u""
                     if num==const.UP:
                         direction = u"↑"
@@ -196,15 +194,15 @@ class main:
                     else:
                         direction = u"→"
                 #start地点の色塗り
-                if int(x) == int(_map.start_grid[0]) and int(y) == int(_map.start_grid[1]):
+                if int(x) == int(self.map.start_grid[0]) and int(y) == int(self.map.start_grid[1]):
                     const.CS_COLOR = (255, 204, 0)
                     pygame.draw.rect(screen,const.CS_COLOR,Rect(x*CS,y*CS,CS,CS))
                 #goal地点の色塗り
-                if int(x) == int(_map.goal_grid[0]) and int(y) == int(_map.goal_grid[1]):
+                if int(x) == int(self.map.goal_grid[0]) and int(y) == int(self.map.goal_grid[1]):
                     const.CS_COLOR = (36, 193, 227)
                     pygame.draw.rect(screen,const.CS_COLOR,Rect(x*CS,y*CS,CS,CS))
 
-                if self.map.get_max_q_action_return_q(_map.qtable,x,y) > 0 and self.map.get_max_q_prob(_map.qtable,x,y) >= 0.9:
+                if self.map.get_max_q_action_return_q(self.map.qtable,x,y) > 0 and self.map.get_max_q_prob(self.map.qtable,x,y) >= 0.9:
                     screen.blit(self.font.render(direction, True, (0,0,0)), (x*CS,y*CS))
 
                 pygame.draw.rect(screen,(50,50,50),Rect(x*CS,y*CS,CS,CS),1)

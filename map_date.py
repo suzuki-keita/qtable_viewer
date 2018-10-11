@@ -3,7 +3,6 @@
 import main
 import const
 import random
-import math
 import numpy as np
 
 class map_date:
@@ -18,8 +17,8 @@ class map_date:
         ー＋ー＋ー
         ６│７│８
         """
-        self.mapping_table = np.zeros((const.S_NUM_ROW + 1, const.S_NUM_COL + 1, const.ACTION, const.MAP))
-        self.qtable = np.zeros((const.S_NUM_ROW+1, const.S_NUM_COL + 1, const.ACTION))
+        self.mapping_table = np.zeros((const.NUM_ROW + 2, const.NUM_COL + 2, const.ACTION, const.MAP))
+        self.qtable = np.zeros((const.NUM_ROW+2, const.NUM_COL + 2, const.ACTION))
         self.start_grid = [-1,-1]
         self.goal_grid = [-1,-1]
         self.route_x = []
@@ -92,7 +91,7 @@ class map_date:
         elif _a == const.DOWN:
             _x = _x
             _y = _y + 1
-        if _x > const.S_NUM_ROW or _x < 0 or _y > const.S_NUM_COL or _y < 0:
+        if _x > const.NUM_ROW or _x < 0 or _y > const.NUM_COL or _y < 0:
             return -1,-1
         else:
             return _x,_y
@@ -116,7 +115,7 @@ class map_date:
             _y = _y + 1
 
         #データ整形
-        if _x > const.S_NUM_ROW or _x < 0 or _y > const.S_NUM_COL or _y < 0:
+        if _x > const.NUM_ROW or _x < 0 or _y > const.NUM_COL or _y < 0:
             return 0.0,_x,_y
         else:
             return self.get_max_q_action_return_q(_qtable,_x,_y),_x,_y
@@ -127,7 +126,7 @@ class map_date:
         self.route_length = len(self.route_x)
         self.route_rotation = 0
         self.route_possibility = 0
-        self.possibility_table = np.zeros((const.S_NUM_ROW+1, const.S_NUM_COL+1))
+        self.possibility_table = np.zeros((const.NUM_ROW+1, const.NUM_COL+1))
         self.maps = []
         for i in range(0,self.route_length):
             #回転数
@@ -205,12 +204,12 @@ class map_date:
         for act in range(len(posible_action)):
             no = posible_action[act]
             tmp = no[1] / const.T
-            denom = math.exp(tmp) + denom
-
+            denom = np.exp(tmp) + denom
+        
         for act in range(len(posible_action)):
             no = posible_action[act]
             tmp = no[1] / const.T
-            prob[act] =  math.exp(tmp) / denom
+            prob[act] =  np.exp(tmp) / denom
             if max_prob < prob[act]:
                 max_prob = prob[act]
 
